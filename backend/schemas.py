@@ -1,61 +1,79 @@
-from pydantic import BaseModel
-from typing import Optional
+# backend/schemas.py
+from pydantic import BaseModel, Field
+from typing import Optional, List
 from datetime import datetime
 
-# ---------- User ----------
+# ---- User ----
 class UserBase(BaseModel):
-    name: str
-    email: str
+    id: str = Field(..., description="Phone number for citizens or admin code for admins")
+    name: Optional[str]
 
 class UserCreate(UserBase):
     password: str
+    role: str = Field(..., regex="^(citizen|admin)$")
+
+class UserOut(BaseModel):
+    id: str
+    name: Optional[str]
     role: str
+    created_at: Optional[datetime]
 
-class UserOut(UserBase):
-    id: int
-    role: str
-    class Config:
-        orm_mode = True  # allows returning SQLAlchemy models directly
-
-# ---------- Token ----------
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-class UserLogin(BaseModel):
-    email: str
-    password: str
-
-# ---------- Issue ----------
-class IssueBase(BaseModel):
-    title: str
-    description: str
-    location: str
-    category: Optional[str] = None
-
-class IssueCreate(IssueBase):
-    image_url: Optional[str] = None
-
-class IssueOut(IssueBase):
-    id: int
-    user_id: int
-    image_url: str
-    status: str
-    created_at: datetime
     class Config:
         orm_mode = True
 
-# ---------- Feedback ----------
-class FeedbackBase(BaseModel):
+class UserLogin(BaseModel):
+    id: str
+    password: str
+
+# ---- Token ----
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+# ---- Issue ----
+class IssueCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    latitude: Optional[str] = None
+    longitude: Optional[str] = None
+    location_text: Optional[str] = None
+
+class IssueOut(BaseModel):
+    id: str
+    reporter_id: str
+    title: str
+    description: Optional[str]
+    image_url: Optional[str]
+    category: Optional[str]
+    latitude: Optional[str]
+    longitude: Optional[str]
+    location_text: Optional[str]
+    status: str
+    assigned_to: Optional[str]
+    created_at: Optional[datetime]
+
+    class Config:
+        orm_mode = True
+
+# ---- Feedback ----
+class FeedbackCreate(BaseModel):
+    issue_id: str
+    user_id: str
     rating: int
     comments: Optional[str] = None
 
-class FeedbackCreate(FeedbackBase):
-    issue_id: int
-
-class FeedbackOut(FeedbackBase):
+class FeedbackOut(BaseModel):
     id: int
-    issue_id: int
-    created_at: datetime
+    issue_id: str
+    user_id: str
+    rating: int
+    comments: Optional[str]
+    created_at: Optional[datetime]
+
     class Config:
         orm_mode = True
+
+# ---- Analytics simple ----
+class AnalyticsOut(BaseModel):
+    category_counts: dict
+    status_counts: dict

@@ -1,18 +1,19 @@
+# backend/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .database import Base, engine
-from .routes import auth_routes
+from .database import engine, Base
+from .routes import auth_routes, issue_routes, feedback_routes, admin_routes
 
-# Create all tables (optional; can skip if DB already made)
-Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)  # safe for dev
 
 app = FastAPI(title="City Voice Backend")
 
-# Allow frontend requests
 origins = [
-    "http://localhost:5173",  # React dev server
-    "https://your-frontend-domain.com"
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    # add your deployed frontend URL here
 ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -21,9 +22,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routes
 app.include_router(auth_routes.router)
+app.include_router(issue_routes.router)
+app.include_router(feedback_routes.router)
+app.include_router(admin_routes.router)
 
 @app.get("/")
-def home():
-    return {"message": "City Voice API is running!"}
+def root():
+    return {"message": "CityVoice Backend Running"}
