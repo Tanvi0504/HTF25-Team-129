@@ -17,7 +17,7 @@ MAX_VOTES_FOR_FULL_SCORE = 50
 
 # --- Image Classification Simulation ---
 
-def classify_image(image_path: str) -> Tuple[str, float]:
+def predict_issue_category_from_image(image_path: str) -> Tuple[str, float]: # FIX: Renamed function
     """
     Mocks the execution of the trained AI model (e.g., a CNN) to classify 
     the issue type from the submitted photo and returns a confidence score.
@@ -111,7 +111,8 @@ if __name__ == '__main__':
     mock_image_path = "backend/static/uploads/issue_123.jpg"
 
     # 1. Run Classification
-    category, confidence = classify_image(mock_image_path)
+    # FIX: Updated call site to match the function name
+    category, confidence = predict_issue_category_from_image(mock_image_path) 
     print(f"\n[CLASSIFICATION RESULT]")
     print(f"Image Path: {mock_image_path}")
     print(f"Detected Category: {category}")
