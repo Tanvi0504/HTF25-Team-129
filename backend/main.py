@@ -1,8 +1,8 @@
 # backend/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .database import engine, Base
-from .routes import auth_routes, issue_routes, feedback_routes, admin_routes
+from database import engine, Base
+from routes import auth_routes, issue_routes, feedback_routes, admin_routes
 
 Base.metadata.create_all(bind=engine)  # safe for dev
 

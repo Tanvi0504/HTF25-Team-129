@@ -10,7 +10,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
-    role: str = Field(..., regex="^(citizen|admin)$")
+    role: str = Field(..., pattern="^(citizen|admin)$")
 
 class UserOut(BaseModel):
     id: str
@@ -19,7 +19,8 @@ class UserOut(BaseModel):
     created_at: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        # Changed 'orm_mode' to 'from_attributes' for Pydantic V2 compatibility
+        from_attributes = True
 
 class UserLogin(BaseModel):
     id: str
@@ -53,7 +54,8 @@ class IssueOut(BaseModel):
     created_at: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        # Changed 'orm_mode' to 'from_attributes' for Pydantic V2 compatibility
+        from_attributes = True
 
 # ---- Feedback ----
 class FeedbackCreate(BaseModel):
@@ -71,7 +73,8 @@ class FeedbackOut(BaseModel):
     created_at: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        # Changed 'orm_mode' to 'from_attributes' for Pydantic V2 compatibility
+        from_attributes = True
 
 # ---- Analytics simple ----
 class AnalyticsOut(BaseModel):

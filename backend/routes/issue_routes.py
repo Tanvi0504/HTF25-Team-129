@@ -1,13 +1,15 @@
 # backend/routes/issue_routes.py
 from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException, Header
 from sqlalchemy.orm import Session
-from ..database import SessionLocal
-from .. import crud, schemas
-from ..utils.image_upload import save_upload_file
-from ..ai.predict import predict_issue_category_from_image
-from ..utils.notifications import send_notification_console
-from ..utils.auth import decode_token
-from typing import Optional
+from database import SessionLocal
+# FIX: Only import the schemas needed for this file and use them directly.
+from schemas import IssueOut, IssueCreate, FeedbackCreate 
+import crud
+from utils.image_upload import save_upload_file
+from ai.predict import predict_issue_category_from_image
+from utils.notifications import send_notification_console
+from utils.auth import decode_token
+from typing import Optional, List # Added List import for clarity if using Python < 3.9
 
 router = APIRouter(prefix="/issues", tags=["issues"])
 
@@ -19,7 +21,7 @@ def get_db():
         db.close()
 
 # Create issue (multipart). Frontend should send Authorization header or pass token field.
-@router.post("/", response_model=schemas.IssueOut)
+@router.post("/", response_model=IssueOut) # FIX: Removed schemas.
 async def create_issue(
     title: str = Form(...),
     description: Optional[str] = Form(None),
@@ -68,12 +70,12 @@ async def create_issue(
 
     return issue
 
-@router.get("/", response_model=list[schemas.IssueOut])
+@router.get("/", response_model=List[IssueOut]) # FIX: Removed schemas., using List for Python < 3.9 compatibility
 def list_issues(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     items = crud.list_issues(db, skip=skip, limit=limit)
     return items
 
-@router.get("/my", response_model=list[schemas.IssueOut])
+@router.get("/my", response_model=List[IssueOut]) # FIX: Removed schemas.
 def my_issues(token: Optional[str] = Header(None), db: Session = Depends(get_db)):
     if not token or not token.lower().startswith("bearer "):
         raise HTTPException(status_code=401, detail="Authorization header with bearer token required")

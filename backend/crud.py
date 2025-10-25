@@ -1,8 +1,9 @@
 # backend/crud.py
 from sqlalchemy.orm import Session
-from . import models, schemas
+import models, schemas  # FIXED: Absolute imports
+from utils.auth import hash_password, verify_password # FIXED: Absolute import and moved verify_password to top
 import uuid
-from .utils.auth import hash_password
+from sqlalchemy import func
 
 # -- User operations --
 def create_citizen(db: Session, user_in: schemas.UserCreate):
@@ -36,7 +37,7 @@ def authenticate_user(db: Session, user_id: str, plain_password: str):
     user = get_user(db, user_id)
     if not user:
         return None
-    from .utils.auth import verify_password
+    # Removed relative import here, moved to the top
     if not verify_password(plain_password, user.password):
         return None
     return user
@@ -113,7 +114,6 @@ def create_feedback(db: Session, fb: schemas.FeedbackCreate):
 
 # -- Analytics simple --
 def analytics_summary(db: Session):
-    from sqlalchemy import func
     cat_counts = dict(db.query(models.Issue.category, func.count(models.Issue.id)).group_by(models.Issue.category).all())
     status_counts = dict(db.query(models.Issue.status, func.count(models.Issue.id)).group_by(models.Issue.status).all())
     return {"category_counts": cat_counts, "status_counts": status_counts}

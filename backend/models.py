@@ -1,7 +1,7 @@
 # backend/models.py
 from sqlalchemy import Column, String, Text, DateTime, ForeignKey, Integer, Table, func
 from sqlalchemy.orm import relationship
-from .database import Base
+from database import Base
 
 # Many-to-many for votes: which users voted for which issues
 issue_votes = Table(
